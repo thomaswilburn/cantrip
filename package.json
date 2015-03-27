@@ -1,0 +1,12 @@
+{
+  "name": "cantrip",
+  "version": "1.0.0",
+  "description": "Codename generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thomas Wilburn",
+  "license": "GPLv2",
+  "bin": "index.js"
+}
