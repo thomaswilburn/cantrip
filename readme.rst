@@ -3,8 +3,13 @@ Cantrip
 
 A codename generator for Node
 
-Clone to a local directory, and then install globally with::
+Install from GitHub::
 
-    npm install ./cantrip -g
+    npm install thomaswilburn/cantrip -g
+
+Then run with the ``cantrip`` command. You can specify words of speech in order to get more varied results::
+
+    $ cantrip adjective noun adverb verb
+    idle-platoon-badly-infuse
 
 Based on databases from the `WordNet project <http://wordnet.princeton.edu>`__.
