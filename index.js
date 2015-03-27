@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 
+//tweaks
+var minSynset = 2;
+var minPointers = 3;
+
 var fs = require("fs");
+var path = require("path");
 
 var args = process.argv;
 var config = {
@@ -21,25 +26,27 @@ var parseIndex = function(index) {
       if (!key) return;
       data[key] = line[i];
     });
-    if (data.lemma.indexOf("_") > -1) continue; //skip weird names
+    if (data.lemma.match(/[-_]/)) continue; //skip weird names
+    if (data.pointers * 1 < minPointers || data.synsets * 1 < minSynset) continue; //skip super-obscure words
     lines.push(data);
   }
-  //console.log("loaded " + lines.length + " lines");
+  if (config.verbose) console.log("loaded " + lines.length + " lines");
   return lines;
 }
 
 var db = {};
 
-var indices = fs.readdirSync("./data").forEach(function(filename) {
+var indices = fs.readdirSync(path.join(__dirname, "data")).forEach(function(filename) {
   var pos = filename.split(".").pop();
-  var file = fs.readFileSync("./data/" + filename, "utf8");
-  //console.log("parsing " + filename);
+  var file = fs.readFileSync(path.join(__dirname, "data", filename), "utf8");
+  if (config.verbose) console.log("parsing " + filename);
   db[pos] = parseIndex(file);
 });
 
 var getWord = function(pos) {
   var index = db[pos];
   var item = index[Math.floor(Math.random() * index.length)];
+  if (config.verbose) console.log("Found word", item);
   return item.lemma;
 }
 
