@@ -16,21 +16,21 @@ var columns = ["lemma", "pos", "synsets", "pointers", "pointerSymbol", null, "ta
 
 var parseIndex = function(index) {
   var lines = [];
-  index = index.split("\n");
-  for (var i = 0; i < index.length; i++) {
-    var line = index[i];
-    if (line.match(/^  \d/)) continue; //skip commented lines
-    line = line.split(" ");
-    var data = {};
-    columns.forEach(function(key, i) {
-      if (!key) return;
-      data[key] = line[i];
-    });
-    if (data.lemma.match(/[-_]/)) continue; //skip weird names
-    if (data.pointers * 1 < minPointers || data.synsets * 1 < minSynset) continue; //skip super-obscure words
-    lines.push(data);
+  //match only non-comment, non-hyphenated lines
+  var matcher = /^([a-zA-Z]+) (\w+) (\w+) (\w+)/gm;
+  var match;
+  var count = 0;
+  while (match = matcher.exec(index)) {
+    var line = {
+      lemma: match[1],
+      pos: match[2],
+      synsets: match[3] * 1,
+      pointers: match[4] * 1
+    };
+    //skip obscure words
+    if (line.pointers < minPointers || line.synsets < minSynset) continue;
+    lines.push(line);
   }
-  if (config.verbose) console.log("loaded " + lines.length + " lines");
   return lines;
 }
 
@@ -38,6 +38,7 @@ var db = {};
 
 var indices = fs.readdirSync(path.join(__dirname, "data")).forEach(function(filename) {
   var pos = filename.split(".").pop();
+  if (config.verbose) console.log("reading " + filename);
   var file = fs.readFileSync(path.join(__dirname, "data", filename), "utf8");
   if (config.verbose) console.log("parsing " + filename);
   db[pos] = parseIndex(file);
